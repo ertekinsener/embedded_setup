@@ -32,6 +32,7 @@ ADDITIONAL_PACKAGES=(
     libusb1-devel
     libftdi-devel
     arm-none-eabi-gcc-cs
+    arm-none-eabi-gcc-cs-c++
     arm-none-eabi-binutils-cs
     arm-none-eabi-newlib
     gdb
