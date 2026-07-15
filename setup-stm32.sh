@@ -38,6 +38,7 @@ ADDITIONAL_PACKAGES=(
     gdb
     openocd
     stlink
+    cutecom
 )
 sudo dnf install -y "${ADDITIONAL_PACKAGES[@]}"
 
@@ -101,4 +102,7 @@ cd "$ST_CMAKE_DIR"
 git clone https://github.com/ObKo/stm32-cmake.git
 
 cd "$BASE_DIR"
+
+sudo usermod -a -G dialout "$(whoami)"
+
 echo "Setup script completed."
