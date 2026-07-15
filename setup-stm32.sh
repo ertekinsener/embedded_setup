@@ -18,6 +18,9 @@ ST_CUBEMX_DIR="$ST_TOOLS_DIR/CubeMX"
 ST_SVD_DIR="$ST_TOOLS_DIR/SVD"
 ST_CMAKE_DIR="$ST_TOOLS_DIR/CMake"
 
+ESP_IDF_DIR="$BASE_DIR/Tools/esp-idf"
+ESP_IDF_TOOLS_DIR="$BASE_DIR/Tools/esp-idf-tools"
+
 ADDITIONAL_PACKAGES=(
 	git
 	unzip
@@ -41,6 +44,7 @@ ADDITIONAL_PACKAGES=(
     cutecom
 )
 sudo dnf install -y "${ADDITIONAL_PACKAGES[@]}"
+sudo dnf install -y git wget flex bison gperf python3 cmake ninja-build ccache dfu-util libusbx
 
 # Substitute the variable into auto-install.xml
 sed -i "s|<installpath>.*</installpath>|<installpath>$ST_CUBEMX_DIR</installpath>|g" ./auto-install.xml
@@ -77,6 +81,32 @@ if [ -f $INSTALLER_DIR/cubemx.zip ]; then
 else
     echo "Cannot find file."
 fi
+
+cd "$BASE_DIR"
+
+# Setup ESP-IDF
+
+if [ ! -d "$ESP_IDF_DIR" ]; then
+    echo "Installing ESP-IDF..."
+    mkdir -p "$BASE_DIR/Tools"
+    cd "$BASE_DIR/Tools"
+    git clone -b v6.0.2 --recursive https://github.com/espressif/esp-idf.git
+    cd "$ESP_IDF_DIR"
+	export IDF_TOOLS_PATH="$ESP_IDF_TOOLS_DIR"
+    ./install.sh all
+    echo "ESP-IDF installation complete."
+else
+    echo "ESP-IDF already installed at $ESP_IDF_DIR"
+fi
+
+# add ESP-IDF environment variables to .bashrc as alias
+if ! grep -q "alias get_idf='. $ESP_IDF_DIR/export.sh'" "$HOME/.bashrc"; then
+	echo "Adding ESP-IDF environment variables to .bashrc"
+	echo "export IDF_TOOLS_PATH=\"$ESP_IDF_TOOLS_DIR\"" >> "$HOME/.bashrc"
+	echo "alias get_idf='. $ESP_IDF_DIR/export.sh'" >> "$HOME/.bashrc"
+fi
+
+cd "$BASE_DIR"
 
 mkdir -p "$ST_CUBE_REPOS_DIR"
 cd "$ST_CUBE_REPOS_DIR"
